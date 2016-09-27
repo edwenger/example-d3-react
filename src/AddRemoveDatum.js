@@ -11,7 +11,9 @@ var AddRemoveDatum = React.createClass({
         <span> - </span>
         <a href="#" onClick={this.handleRemove}>Remove</a>
         <span> - </span>
-        <a href="#" onClick={this.handleUpdate}>Update</a>
+        <a href="#" onClick={this.handleInfect}>Infect</a>
+        <span> - </span>
+        <a href="#" onClick={this.handleImmune}>Immune</a>
       </p>
     );
   },
@@ -35,11 +37,20 @@ var AddRemoveDatum = React.createClass({
     });
   },
 
-  handleUpdate: function(e) {
+  handleInfect: function(e) {
     e.preventDefault();
     var domain = this.props.appState.domain;
     this.props.setAppState({
-      data: this.props.updateDatum(domain),
+      data: this.props.infectDatum(domain),
+      prevDomain: null
+    });
+  },
+
+  handleImmune: function(e) {
+    e.preventDefault();
+    var domain = this.props.appState.domain;
+    this.props.setAppState({
+      data: this.props.immuneDatum(domain),
       prevDomain: null
     });
   }

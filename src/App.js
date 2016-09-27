@@ -25,7 +25,7 @@ var App = React.createClass({
     };
   },
 
-  _allData: dataGenerator.generate(5000),
+  _allData: dataGenerator.generate(50),
 
   getData: function(domain) {
     return _.filter(this._allData, this.isInDomain.bind(null, domain));
@@ -44,10 +44,18 @@ var App = React.createClass({
     return this.getData(domain);
   },
 
-  updateDatum: function(domain) {
+  infectDatum: function(domain) {
     var matches = _.filter(this._allData, this.isInDomain.bind(null, domain));
     if (matches.length > 0) {
-      _.sample(matches).c = 1;
+      _.sample(matches).infectiousness = 1;
+    }
+    return this.getData(domain);
+  },
+
+  immuneDatum: function(domain) {
+    var matches = _.filter(this._allData, this.isInDomain.bind(null, domain));
+    if (matches.length > 0) {
+      _.sample(matches).receptivity = 0;
     }
     return this.getData(domain);
   },
@@ -67,15 +75,16 @@ var App = React.createClass({
           appState={this.state}
           setAppState={this.setAppState} />
         <Stats data={this.state.data} />
-        <ShowHideTooltips
-          appState={this.state}
-          setAppState={this.setAppState} />
+        {/*<ShowHideTooltips*/}
+          {/*appState={this.state}*/}
+          {/*setAppState={this.setAppState} />*/}
         <AddRemoveDatum
           appState={this.state}
           setAppState={this.setAppState}
           addDatum={this.addDatum}
           removeDatum={this.removeDatum}
-          updateDatum={this.updateDatum}/>
+          infectDatum={this.infectDatum}
+          immuneDatum={this.immuneDatum}/>
       </div>
     );
   },

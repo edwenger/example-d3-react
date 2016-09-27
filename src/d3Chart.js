@@ -51,15 +51,23 @@ ns._scales = function(el, domain) {
     .range([height, 0])
     .domain(domain.y);
 
-  var z = d3.scale.linear()
-    .range([5, 20])
-    .domain([1, 10]);
+  var r = d3.scale.sqrt()
+    .range([3, 20])
+    .domain([1, 100]);
 
-  var c = d3.scale.quantile()
-    .range(colorbrewer.Reds[9])
+  var fill_c = d3.scale.quantile()
+    .range(['#ffffff'].concat(colorbrewer.Reds[9].slice(0, 8)))
     .domain([0, 1]);
 
-  return {x: x, y: y, z: z, c: c};
+  var stroke_c = d3.scale.quantile()
+    .range(['#a3c1a6', '#a0b593', '#a0a784', '#a1977a', '#9f8574', '#9a7571', '#8e6470', '#7b546d', '#604463'])  // sns.cubehelix_palette(9, dark=0.1, hue=0.5, light=0.5, start=0, rot=1.3, gamma=0.5).as_hex()
+    .domain(_.range(0, 1.0001, 0.1));
+
+  var stroke_w = d3.scale.pow().exponent(2)
+    .range([1, 5])
+    .domain([0, 1]);
+
+  return {x: x, y: y, r: r, stroke_c: stroke_c, stroke_w: stroke_w, fill_c: fill_c};
 };
 
 ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
@@ -88,8 +96,10 @@ ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
       .attr('cx', function(d) { return scales.x(d.x); })
       .attr('cy', function(d) { return scales.y(d.y); });
 
-  point.attr('r', function(d) { return scales.z(d.z); })
-      .attr('fill', function(d) { return scales.c(d.c); })
+  point.attr('r', function(d) { return scales.r(d.weight); })
+      .attr('fill', function(d) { return scales.fill_c(d.infectiousness); })
+      .attr('stroke', function(d) { return scales.stroke_c(d.receptivity); })
+      .attr('stroke-width', function(d) { return scales.stroke_w(d.receptivity); })
       .on('mouseover', function(d) {
         dispatcher.emit('point:mouseover', d);
       })
@@ -133,27 +143,27 @@ ns._drawTooltips = function(el, scales, tooltips, prevScales) {
       })
       .attr('y', function(d) {
         if (prevScales) {
-          return prevScales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT;
+          return prevScales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT;
         }
-        return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT;
+        return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT;
       })
     .transition()
       .duration(ANIMATION_DURATION)
       .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
-      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; });
+      .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT; });
 
   tooltipRect
     .transition()
       .duration(ANIMATION_DURATION)
       .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
-      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; });
+      .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT; });
 
   if (prevScales) {
     tooltipRect.exit()
       .transition()
         .duration(ANIMATION_DURATION)
         .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
-        .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; })
+        .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT; })
         .remove();
   }
   else {
@@ -168,7 +178,7 @@ ns._drawTooltips = function(el, scales, tooltips, prevScales) {
       .attr('class', 'd3-tooltip-text')
       .attr('dy', '0.35em')
       .attr('text-anchor', 'middle')
-      .text(function(d) { return d.z; })
+      .text(function(d) { return d.weight; })
       .attr('x', function(d) {
         if (prevScales) {
           return prevScales.x(d.x);
@@ -177,26 +187,26 @@ ns._drawTooltips = function(el, scales, tooltips, prevScales) {
       })
       .attr('y', function(d) {
         if (prevScales) {
-          return prevScales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2;
+          return prevScales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT/2;
         }
-          return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2;
+          return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT/2;
       })
     .transition()
       .duration(ANIMATION_DURATION)
       .attr('x', function(d) { return scales.x(d.x); })
-      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; });
+      .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT/2; });
 
   tooltipText.transition()
       .duration(ANIMATION_DURATION)
       .attr('x', function(d) { return scales.x(d.x); })
-      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; });
+      .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT/2; });
 
   if (prevScales) {
     tooltipText.exit()
       .transition()
         .duration(ANIMATION_DURATION)
         .attr('x', function(d) { return scales.x(d.x); })
-        .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; })
+        .attr('y', function(d) { return scales.y(d.y) - scales.r(d.weight)/2 - TOOLTIP_HEIGHT/2; })
         .remove();
   }
   else {
