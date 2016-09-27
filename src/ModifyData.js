@@ -2,39 +2,16 @@
 
 var React = require('react');
 
-var AddRemoveDatum = React.createClass({
+var ModifyData = React.createClass({
   render: function() {
     return (
       <p>
         {'Data points: '}
-        <a href="#" onClick={this.handleAdd}>Add</a>
-        <span> - </span>
-        <a href="#" onClick={this.handleRemove}>Remove</a>
-        <span> - </span>
         <a href="#" onClick={this.handleInfect}>Infect</a>
         <span> - </span>
         <a href="#" onClick={this.handleImmune}>Immune</a>
       </p>
     );
-  },
-
-  handleAdd: function(e) {
-    e.preventDefault();
-    var domain = this.props.appState.domain;
-    this.props.setAppState({
-      data: this.props.addDatum(domain),
-      // Disable animation
-      prevDomain: null
-    });
-  },
-
-  handleRemove: function(e) {
-    e.preventDefault();
-    var domain = this.props.appState.domain;
-    this.props.setAppState({
-      data: this.props.removeDatum(domain),
-      prevDomain: null
-    });
   },
 
   handleInfect: function(e) {
@@ -56,4 +33,4 @@ var AddRemoveDatum = React.createClass({
   }
 });
 
-module.exports = AddRemoveDatum;
+module.exports = ModifyData;

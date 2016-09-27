@@ -9,13 +9,13 @@ var Pagination = require('./Pagination');
 var Chart = require('./Chart');
 var Stats = require('./Stats');
 var ShowHideTooltips = require('./ShowHideTooltips');
-var AddRemoveDatum = require('./AddRemoveDatum');
+var ModifyData = require('./ModifyData');
 
 require('./App.less');
 
 var App = React.createClass({
   getInitialState: function() {
-    var domain = {x: [0, 100], y: [0, 100]};
+    var domain = {x: [-50, 50], y: [-20, 20]};
     return {
       data: this.getData(domain),
       domain: domain,
@@ -25,27 +25,14 @@ var App = React.createClass({
     };
   },
 
-  _allData: dataGenerator.generate(50),
+  _transmission_graph: dataGenerator.generate_households(500, 5).graph,
 
   getData: function(domain) {
-    return _.filter(this._allData, this.isInDomain.bind(null, domain));
-  },
-
-  addDatum: function(domain) {
-    this._allData.push(dataGenerator.generateDatum(domain));
-    return this.getData(domain);
-  },
-
-  removeDatum: function(domain) {
-    var match = _.find(this._allData, this.isInDomain.bind(null, domain));
-    if (match) {
-      this._allData = _.reject(this._allData, {id: match.id});
-    }
-    return this.getData(domain);
+    return _.filter(this._transmission_graph.nodes(), this.isInDomain.bind(null, domain));
   },
 
   infectDatum: function(domain) {
-    var matches = _.filter(this._allData, this.isInDomain.bind(null, domain));
+    var matches = _.filter(this._transmission_graph.nodes(), this.isInDomain.bind(null, domain));
     if (matches.length > 0) {
       _.sample(matches).infectiousness = 1;
     }
@@ -53,7 +40,7 @@ var App = React.createClass({
   },
 
   immuneDatum: function(domain) {
-    var matches = _.filter(this._allData, this.isInDomain.bind(null, domain));
+    var matches = _.filter(this._transmission_graph.nodes(), this.isInDomain.bind(null, domain));
     if (matches.length > 0) {
       _.sample(matches).receptivity = 0;
     }
@@ -71,20 +58,15 @@ var App = React.createClass({
           appState={this.state}
           setAppState={this.setAppState}
           getData={this.getData} />
+        <ModifyData
+          appState={this.state}
+          setAppState={this.setAppState}
+          infectDatum={this.infectDatum}
+          immuneDatum={this.immuneDatum}/>
         <Chart
           appState={this.state}
           setAppState={this.setAppState} />
         <Stats data={this.state.data} />
-        {/*<ShowHideTooltips*/}
-          {/*appState={this.state}*/}
-          {/*setAppState={this.setAppState} />*/}
-        <AddRemoveDatum
-          appState={this.state}
-          setAppState={this.setAppState}
-          addDatum={this.addDatum}
-          removeDatum={this.removeDatum}
-          infectDatum={this.infectDatum}
-          immuneDatum={this.immuneDatum}/>
       </div>
     );
   },
