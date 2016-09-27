@@ -1,5 +1,18 @@
+var cuid = require('cuid');
+var Combinatorics = require('js-combinatorics');
 var sigma = require('./build/sigma.require.js');
 var TransmissionNode = require('./TransmissionNode');
+
+sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+    var k,
+        neighbors = {},
+        index = this.allNeighborsIndex[nodeId] || {};
+
+    for (k in index) {
+        neighbors[k] = this.nodesIndex[k];
+    }
+    return neighbors;
+});
 
 var X_MIN = -100;
 var X_MAX = 100;
@@ -43,7 +56,17 @@ ns.generate_households = function(n_houses, mean_size) {
       ind_ids.push(ind.id);
       s.graph.addNode(ind);
     }
+    var cmb = Combinatorics.combination(ind_ids, 2);
+    cmb.forEach((x) => s.graph.addEdge({
+      id: 'e_' + cuid(),
+      source: x[0],
+      target: x[1],
+      weight: 1
+    }));
   }
+  // console.log(ind_ids);
+  // console.log(s.graph.nodes(ind_ids[0]));
+  // console.log(s.graph.neighbors(ind_ids[0]));
   return s;
 };
 
