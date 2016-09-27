@@ -71,12 +71,19 @@ ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
         }
         return scales.x(d.x);
       })
+      .attr('cy', function(d) {
+        if (prevScales) {
+          return prevScales.y(d.y);
+        }
+        return scales.y(d.y);
+      })
+
     .transition()
       .duration(ANIMATION_DURATION)
-      .attr('cx', function(d) { return scales.x(d.x); });
+      .attr('cx', function(d) { return scales.x(d.x); })
+      .attr('cy', function(d) { return scales.y(d.y); });
 
-  point.attr('cy', function(d) { return scales.y(d.y); })
-      .attr('r', function(d) { return scales.z(d.z); })
+  point.attr('r', function(d) { return scales.z(d.z); })
       .on('mouseover', function(d) {
         dispatcher.emit('point:mouseover', d);
       })
@@ -85,13 +92,15 @@ ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
       })
     .transition()
       .duration(ANIMATION_DURATION)
-      .attr('cx', function(d) { return scales.x(d.x); });
+      .attr('cx', function(d) { return scales.x(d.x); })
+      .attr('cy', function(d) { return scales.y(d.y); });
 
   if (prevScales) {
     point.exit()
       .transition()
         .duration(ANIMATION_DURATION)
         .attr('cx', function(d) { return scales.x(d.x); })
+        .attr('cy', function(d) { return scales.y(d.y); })
         .remove();
   }
   else {
@@ -116,20 +125,29 @@ ns._drawTooltips = function(el, scales, tooltips, prevScales) {
         }
         return scales.x(d.x) - TOOLTIP_WIDTH/2;
       })
+      .attr('y', function(d) {
+        if (prevScales) {
+          return prevScales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT;
+        }
+        return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT;
+      })
     .transition()
       .duration(ANIMATION_DURATION)
-      .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; });
+      .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
+      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; });
 
-  tooltipRect.attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; })
+  tooltipRect
     .transition()
       .duration(ANIMATION_DURATION)
-      .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; });
+      .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
+      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; });
 
   if (prevScales) {
     tooltipRect.exit()
       .transition()
         .duration(ANIMATION_DURATION)
         .attr('x', function(d) { return scales.x(d.x) - TOOLTIP_WIDTH/2; })
+        .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT; })
         .remove();
   }
   else {
@@ -151,20 +169,28 @@ ns._drawTooltips = function(el, scales, tooltips, prevScales) {
         }
         return scales.x(d.x);
       })
+      .attr('y', function(d) {
+        if (prevScales) {
+          return prevScales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2;
+        }
+          return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2;
+      })
     .transition()
       .duration(ANIMATION_DURATION)
-      .attr('x', function(d) { return scales.x(d.x); });
+      .attr('x', function(d) { return scales.x(d.x); })
+      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; });
 
-  tooltipText.attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; })
-    .transition()
+  tooltipText.transition()
       .duration(ANIMATION_DURATION)
-      .attr('x', function(d) { return scales.x(d.x); });
+      .attr('x', function(d) { return scales.x(d.x); })
+      .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; });
 
   if (prevScales) {
     tooltipText.exit()
       .transition()
         .duration(ANIMATION_DURATION)
         .attr('x', function(d) { return scales.x(d.x); })
+        .attr('y', function(d) { return scales.y(d.y) - scales.z(d.z)/2 - TOOLTIP_HEIGHT/2; })
         .remove();
   }
   else {

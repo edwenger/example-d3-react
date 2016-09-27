@@ -15,17 +15,17 @@ require('./App.less');
 
 var App = React.createClass({
   getInitialState: function() {
-    var domain = [0, 30];
+    var domain = {x: [0, 100], y: [0, 100]};
     return {
       data: this.getData(domain),
-      domain: {x: domain, y: [0, 100]},
+      domain: domain,
       tooltip: null,
       prevDomain: null,
       showingAllTooltips: false
     };
   },
 
-  _allData: dataGenerator.generate(50),
+  _allData: dataGenerator.generate(5000),
 
   getData: function(domain) {
     return _.filter(this._allData, this.isInDomain.bind(null, domain));
@@ -45,7 +45,7 @@ var App = React.createClass({
   },
 
   isInDomain: function(domain, d) {
-    return d.x >= domain[0] && d.x <= domain[1];
+    return d.x >= domain.x[0] && d.x <= domain.x[1] && d.y >= domain.y[0] && d.y <= domain.y[1];
   },
 
   render: function() {
