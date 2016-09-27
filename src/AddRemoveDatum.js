@@ -10,13 +10,15 @@ var AddRemoveDatum = React.createClass({
         <a href="#" onClick={this.handleAdd}>Add</a>
         <span> - </span>
         <a href="#" onClick={this.handleRemove}>Remove</a>
+        <span> - </span>
+        <a href="#" onClick={this.handleUpdate}>Update</a>
       </p>
     );
   },
 
   handleAdd: function(e) {
     e.preventDefault();
-    var domain = this.props.appState.domain.x;
+    var domain = this.props.appState.domain;
     this.props.setAppState({
       data: this.props.addDatum(domain),
       // Disable animation
@@ -26,9 +28,18 @@ var AddRemoveDatum = React.createClass({
 
   handleRemove: function(e) {
     e.preventDefault();
-    var domain = this.props.appState.domain.x;
+    var domain = this.props.appState.domain;
     this.props.setAppState({
       data: this.props.removeDatum(domain),
+      prevDomain: null
+    });
+  },
+
+  handleUpdate: function(e) {
+    e.preventDefault();
+    var domain = this.props.appState.domain;
+    this.props.setAppState({
+      data: this.props.updateDatum(domain),
       prevDomain: null
     });
   }

@@ -44,6 +44,14 @@ var App = React.createClass({
     return this.getData(domain);
   },
 
+  updateDatum: function(domain) {
+    var matches = _.filter(this._allData, this.isInDomain.bind(null, domain));
+    if (matches.length > 0) {
+      _.sample(matches).c = 1;
+    }
+    return this.getData(domain);
+  },
+
   isInDomain: function(domain, d) {
     return d.x >= domain.x[0] && d.x <= domain.x[1] && d.y >= domain.y[0] && d.y <= domain.y[1];
   },
@@ -66,7 +74,8 @@ var App = React.createClass({
           appState={this.state}
           setAppState={this.setAppState}
           addDatum={this.addDatum}
-          removeDatum={this.removeDatum} />
+          removeDatum={this.removeDatum}
+          updateDatum={this.updateDatum}/>
       </div>
     );
   },

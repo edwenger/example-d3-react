@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
 var d3 = require('d3');
+var colorbrewer = require('colorbrewer');
 
 require('./d3Chart.less');
 
@@ -54,7 +55,11 @@ ns._scales = function(el, domain) {
     .range([5, 20])
     .domain([1, 10]);
 
-  return {x: x, y: y, z: z};
+  var c = d3.scale.quantile()
+    .range(colorbrewer.Reds[9])
+    .domain([0, 1]);
+
+  return {x: x, y: y, z: z, c: c};
 };
 
 ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
@@ -84,6 +89,7 @@ ns._drawPoints = function(el, scales, data, prevScales, dispatcher) {
       .attr('cy', function(d) { return scales.y(d.y); });
 
   point.attr('r', function(d) { return scales.z(d.z); })
+      .attr('fill', function(d) { return scales.c(d.c); })
       .on('mouseover', function(d) {
         dispatcher.emit('point:mouseover', d);
       })

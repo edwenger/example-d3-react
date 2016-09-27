@@ -23,11 +23,16 @@ ns.generateDatum = function(domain) {
     x: this._randomIntBetween(domain.x[0], domain.x[1]),
     y: this._randomIntBetween(domain.y[0], domain.y[1]),
     z: this._randomIntBetween(Z_MIN, Z_MAX),
+    c: this._randomFloatBetween(0, 1)
   };
 };
 
 ns._randomIntBetween = function(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
+};
+
+ns._randomFloatBetween = function(min, max) {
+  return Math.random() * (max - min) + min;
 };
 
 ns._uid = function() {

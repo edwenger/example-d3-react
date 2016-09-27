@@ -45,12 +45,12 @@ var Pagination = React.createClass({
 
   handleZoomIn: function(e) {
     e.preventDefault();
-    this.zoomData(0.5);
+    this.zoomData(0.618);
   },
 
   handleZoomOut: function(e) {
     e.preventDefault();
-    this.zoomData(2);
+    this.zoomData(1.618);
   },
 
   shiftData: function(step) {
